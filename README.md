@@ -5,3 +5,4 @@ Tetris for the La Fortuna
 * Center - Rotate Clockwise
 * Left Arrow - Move Left
 * Right Arrow - Move Right 
+* Down Arrow - Drop

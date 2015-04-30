@@ -1,8 +1,15 @@
 # FortunaTetris
 Tetris for the La Fortuna
 
-## Controls
+#### Controls
 * Center - Rotate Clockwise
 * Left Arrow - Move Left
 * Right Arrow - Move Right 
 * Down Arrow - Drop
+
+#### TODO
+* Block speed increase
+* Restarting after game over without hard reset
+* Score
+* Hold block
+* Upcoming blocks

@@ -265,6 +265,9 @@ ISR(TIMER1_COMPA_vect)
 	if(down_pressed()){
 		//move_tetromino(Down);
 	}
+	if(down_held()){
+		move_tetromino(Down);
+	}
 }
 
 ISR(TIMER3_COMPA_vect)
@@ -294,6 +297,8 @@ int main()
 	TCCR1B = _BV(WGM12);
 	TCCR1B |= _BV(CS10);
 	TIMSK1 |= _BV(OCIE1A);
+
+	OCR3A = 0;
 
 	/*timer for random seed */
 	TCCR2B |= (1 << CS10);

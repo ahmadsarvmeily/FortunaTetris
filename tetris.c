@@ -10,8 +10,8 @@
 #define LED_OFF     PORTB &= ~_BV(PINB7) 
 #define LED_TOGGLE  PINB  |=  _BV(PINB7)
 
-#define START_X 4
-#define START_Y 2
+#define START_X 3
+#define START_Y 0
 
 uint16_t grid [GRID_WIDTH][GRID_HEIGHT];
 uint16_t collision_grid [GRID_WIDTH][GRID_HEIGHT];
@@ -24,6 +24,12 @@ int new_y = 0;
 int loop = 1;
 int movable = 1;
 int lines = 0;
+int level = 0;
+int score = 0;
+
+#define MAX_LEVEL 22
+
+int base_score[4] = {40,100,300,1200};
 
 tetromino current_tetromino, last_tetromino;
 
@@ -72,6 +78,10 @@ int redraw(){
 	char points[15];
 	sprintf(points, "Lines: %d", lines);
 	display_string_xy(points,SIDEBAR_START+10,20);
+	sprintf(points, "Level: %d", level);
+	display_string_xy(points,SIDEBAR_START+10,30);
+	sprintf(points, "Score: %d", score);
+	display_string_xy(points,SIDEBAR_START+10,40);
 	int i, j = 0;
 	for ( i = 0; i < GRID_WIDTH; i++ ){
 		for ( j = 0; j < GRID_HEIGHT; j++ ){
@@ -103,7 +113,10 @@ void clear_lines(){
 			}
 		}
 	}
+	score += base_score[count] * (count+1);
 	lines += count;
+	level = div(lines,10).quot;
+	if (count && (level > 0) && (level < MAX_LEVEL)) OCR3A -= 500;
 	if (changed) redraw();
 	
 }
@@ -311,14 +324,23 @@ int main()
 	
 	OCR3A = 15000;
 	
-	display_string_xy("Press Center to Start",60,30);
+	//display_string_xy("Press Center to Start",60,30);
+	display_string_xy("\n",0,0);
+	display_string("   _____ ____ _____ _____ _____ ____\n");
+	display_string("  |_   _|  __|_   _|  _  |_   _| ___|\n");
+	display_string("    | | | |__  | | | |_| | | | \\ \\\n");
+	display_string("    | | |  __| | | | ,  _| | |  \\ \\\n");
+	display_string("    | | | |__  | | | |\\ \\ _| |_ _\\ \\\n");
+	display_string("    |_| |____| |_| |_| \\_\\_____|____|\n");
+	display_string("\n          Press Center to Start");
+
 	while(!center_pressed()){}
 	loop = 1;
 	rectangle background = {0,display.width,0,display.height};
 	display.background = GREY_0;
 	display.foreground = BLACK;
-
 	fill_rectangle(background,display.background);
+
 	redraw();
 
 	srand(TCNT2);

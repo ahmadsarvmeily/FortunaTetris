@@ -302,8 +302,6 @@ void rotated_grid(tetromino_type piece, uint16_t angle){
 
 void draw_tetromino(tetromino_type piece, int16_t y, int16_t x, uint16_t angle, uint16_t color){
 	int i = 0;
-	x = x*BLOCK_SIZE;
-	y = y*BLOCK_SIZE;
 	
 	clear_grid();
 
@@ -555,9 +553,9 @@ void draw_tetromino(tetromino_type piece, int16_t y, int16_t x, uint16_t angle, 
 }
 
 void display_tetromino(tetromino piece){
-	draw_tetromino(piece.type,piece.y,piece.x,piece.angle,piece.type);
+	draw_tetromino(piece.type,piece.y*BLOCK_SIZE,piece.x*BLOCK_SIZE,piece.angle,piece.type);
 }
 
 void clear_tetromino(tetromino piece){
-	draw_tetromino(piece.type,piece.y,piece.x,piece.angle,BLACK);
+	draw_tetromino(piece.type,piece.y*BLOCK_SIZE,piece.x*BLOCK_SIZE,piece.angle,BLACK);
 }

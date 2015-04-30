@@ -84,8 +84,11 @@ int down_pressed(){
 }
 
 int down_held(){
-	if (~PINC & _BV(SWW)) {
+	if ((~PINC & _BV(SWW)) && !down) {
 		return 1;
-	} 
+		down = 1;
+	} else {
+		down = 0;
+	}
 	return 0;
 }

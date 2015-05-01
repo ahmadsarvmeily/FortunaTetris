@@ -113,7 +113,7 @@ void clear_lines(){
 			}
 		}
 	}
-	score += base_score[count] * (count+1);
+	score += base_score[count-1] * (count+1);
 	lines += count;
 	level = div(lines,10).quot;
 	if (count && (level > 0) && (level < MAX_LEVEL)) OCR3A -= 500;
@@ -196,6 +196,7 @@ int rotate_tetromino(){
 	if ((new_tetromino.x + leftmost_rot_block()) < 0) return 0; 
 	if ((new_tetromino.x + rightmost_rot_block()) > GRID_WIDTH-1) return 0;
 
+	//if (check_collision(new_tetromino)) return 0;
 	
 	current_tetromino = new_tetromino; 
 	redraw_tetromino();
@@ -291,6 +292,7 @@ ISR(TIMER3_COMPA_vect)
 	} else {
 		store_block(current_tetromino);
 		spawn_block();
+
 	}
 }
 

@@ -39,6 +39,7 @@ int blocks_taken = 7;
 
 typedef enum {Up,Down,Left,Right} direction;
 
+
 void redraw_tetromino(){
 	cli();
 	clear_tetromino(last_tetromino);
@@ -171,15 +172,15 @@ int spawn_block(){
 	tetromino new_tetromino;	
 	if (blocks_taken == 7) { reset_bag(); };
 	int rand_num;
-	do{
+	do {
 		rand_num = random_block_number();
-	}while (!bag[rand_num]);
+	} while (!bag[rand_num]);
 	
 	bag[rand_num] = 0;
 	blocks_taken++;
 	new_tetromino = block_list[rand_num];
-	if(check_collision(new_tetromino)) {last_tetromino = current_tetromino = new_tetromino; }
-	else { display_string_xy("Game Over",SIDEBAR_START+10,10); LED_OFF; loop = 0; for(;;){} }
+	if(check_collision(new_tetromino)) {last_tetromino = current_tetromino = new_tetromino; return 1;}
+	else { loop = 0; cli(); return 0;}
 }
 
 int rotate_tetromino(){
@@ -196,7 +197,7 @@ int rotate_tetromino(){
 	if ((new_tetromino.x + leftmost_rot_block()) < 0) return 0; 
 	if ((new_tetromino.x + rightmost_rot_block()) > GRID_WIDTH-1) return 0;
 
-	//if (check_collision(new_tetromino)) return 0;
+	if (!check_collision(new_tetromino)) return 0;
 	
 	current_tetromino = new_tetromino; 
 	redraw_tetromino();
@@ -257,6 +258,22 @@ void draw_shape_alternate(rectangle shape, int counter){
 	}
 }
 
+void reset(){
+	at_bottom = 0;
+	old_y = 0;
+	new_y = 0;
+	loop = 1;
+	movable = 1;
+	lines = 0;
+	level = 0;
+	score = 0;
+	blocks_taken = 7;
+	reset_bag();
+	clear_field();
+	clear_area();
+}
+
+
 ISR(INT6_vect)
 {
 	//redraw_tetromino();
@@ -312,6 +329,9 @@ int main()
 	set_frame_rate_hz(61);
 	set_orientation(North);
 	
+	DDRB |= _BV(PB7);
+	PORTB &= ~_BV(PB7);
+
 	EIMSK |= _BV(INT6);
 	/* enable button press inturrupt */
 	TCCR1A = 0;
@@ -341,22 +361,27 @@ int main()
 	display_string("    | | | |__  | | | |\\ \\ _| |_ _\\ \\\n");
 	display_string("    |_| |____| |_| |_| \\_\\_____|____|\n");
 	display_string("\n          Press Center to Start");
+	do{
+		while(!center_pressed()){}
+		reset();
+		rectangle background = {0,display.width,0,display.height};
+		display.background = GREY_0;
+		display.foreground = BLACK;
+		fill_rectangle(background,display.background);
 
-	while(!center_pressed()){}
-	loop = 1;
-	rectangle background = {0,display.width,0,display.height};
-	display.background = GREY_0;
-	display.foreground = BLACK;
-	fill_rectangle(background,display.background);
+		redraw();
 
-	redraw();
-
-	srand(TCNT2);
-	spawn_block();
-	OCR1A = 65535;
-	LED_ON;
-	sei();
-	while(loop){};
-	cli();
-
+		srand(TCNT2);
+		spawn_block();
+		OCR1A = 65535;
+		LED_ON;
+		sei();
+		while(loop){LED_ON;};
+		cli();
+		LED_OFF;
+		display_string_xy("Game Over",SIDEBAR_START+10,10); 
+		display.background = BLACK;
+		display.foreground = WHITE;
+		display_string_xy("Press Center to Restart",0,10);
+	} while (1);
 }

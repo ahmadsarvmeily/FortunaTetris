@@ -8,7 +8,6 @@ Tetris for the La Fortuna
 * Down Arrow - Drop
 
 #### TODO
-* Restarting after game over without hard reset
 
 #### Potential Additions
 * Hold block

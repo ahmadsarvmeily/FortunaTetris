@@ -350,7 +350,7 @@ int main()
 	TCCR3B |= _BV(CS32);
 	TIMSK3 |= _BV(OCIE3A);
 	
-	OCR3A = 15000;
+	OCR3A = 11000;
 	
 	//display_string_xy("Press Center to Start",60,30);
 	display_string_xy("\n",0,0);

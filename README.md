@@ -11,6 +11,5 @@ Tetris for the La Fortuna
 * Restarting after game over without hard reset
 
 #### Potential Additions
-* Score
 * Hold block
 * Upcoming blocks

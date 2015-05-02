@@ -13,29 +13,25 @@
 #define START_X 3
 #define START_Y 0
 
-uint16_t grid [GRID_WIDTH][GRID_HEIGHT];
-uint16_t collision_grid [GRID_WIDTH][GRID_HEIGHT];
+volatile uint16_t grid [GRID_WIDTH][GRID_HEIGHT];
 
-int at_bottom = 0;
+volatile int at_bottom = 0;
 
-int old_y = 0;
-int new_y = 0;
+volatile int loop = 1;
+volatile int movable = 1;
+volatile int lines = 0;
+volatile int level = 0;
+volatile int score = 0;
 
-int loop = 1;
-int movable = 1;
-int lines = 0;
-int level = 0;
-int score = 0;
-
-#define MAX_LEVEL 22
+#define MAX_LEVEL 31
 
 int base_score[4] = {40,100,300,1200};
 
-tetromino current_tetromino, last_tetromino;
+volatile tetromino current_tetromino, last_tetromino;
 
 tetromino block_list[7] = {{O,START_X,START_Y,0},{I,START_X,START_Y,0},{T,START_X,START_Y,0},{J,START_X,START_Y,0},{L,START_X,START_Y,0},{S,START_X,START_Y,0},{Z,START_X,START_Y,0}};
-int bag[7];
-int blocks_taken = 7;
+volatile int bag[7];
+volatile int blocks_taken = 7;
 
 typedef enum {Up,Down,Left,Right} direction;
 
@@ -91,7 +87,6 @@ int redraw(){
 	}
 }
 
-//returns true if full
 int check_line(int line){
 	int count = 0,j = 0;
 	for ( j = 0; j < GRID_WIDTH; j++ ){
@@ -129,11 +124,7 @@ int check_collision(tetromino block){
 			if ((i >= block.x)&&(i < block.x+4)){
 				if ((j >= block.y)&&(j < block.y+4)){ 
 					if (grid[i][j] && block_grid[i-block.x][j-block.y]) return 0;
-				} else {
-					//collision_grid [i][j] = grid[i][j];
-				}
-			} else {
-				//collision_grid [i][j] = grid[i][j];
+				} 
 			}
 		}
 	}
@@ -184,8 +175,6 @@ int spawn_block(){
 }
 
 int rotate_tetromino(){
-	//rotate the current active block
-
 	tetromino new_tetromino = current_tetromino;
 	last_tetromino = current_tetromino;
 	if (new_tetromino.angle == 3) 
@@ -205,7 +194,6 @@ int rotate_tetromino(){
 }
 
 void move_tetromino(direction movement){
-	//move the current active block
 	tetromino new_tetromino;
 	new_tetromino = current_tetromino;
 	last_tetromino = current_tetromino;
@@ -242,7 +230,6 @@ void move_tetromino(direction movement){
 		if (movement == Down) at_bottom = 1;
 	}
 	redraw_tetromino();
-	//show_grid();
 }
 
 void draw_shape_alternate(rectangle shape, int counter){
@@ -260,8 +247,6 @@ void draw_shape_alternate(rectangle shape, int counter){
 
 void reset(){
 	at_bottom = 0;
-	old_y = 0;
-	new_y = 0;
 	loop = 1;
 	movable = 1;
 	lines = 0;
@@ -271,12 +256,6 @@ void reset(){
 	reset_bag();
 	clear_field();
 	clear_area();
-}
-
-
-ISR(INT6_vect)
-{
-	//redraw_tetromino();
 }
 
 ISR(TIMER1_COMPA_vect)
@@ -332,7 +311,7 @@ int main()
 	DDRB |= _BV(PB7);
 	PORTB &= ~_BV(PB7);
 
-	EIMSK |= _BV(INT6);
+	//EIMSK |= _BV(INT6);
 	/* enable button press inturrupt */
 	TCCR1A = 0;
 	TCCR1B = _BV(WGM12);
@@ -350,7 +329,7 @@ int main()
 	TCCR3B |= _BV(CS32);
 	TIMSK3 |= _BV(OCIE3A);
 	
-	OCR3A = 11000;
+	OCR3A = 20000;
 	
 	//display_string_xy("Press Center to Start",60,30);
 	display_string_xy("\n",0,0);
@@ -361,6 +340,7 @@ int main()
 	display_string("    | | | |__  | | | |\\ \\ _| |_ _\\ \\\n");
 	display_string("    |_| |____| |_| |_| \\_\\_____|____|\n");
 	display_string("\n          Press Center to Start");
+
 	do{
 		while(!center_pressed()){}
 		reset();
@@ -376,7 +356,7 @@ int main()
 		OCR1A = 65535;
 		LED_ON;
 		sei();
-		while(loop){LED_ON;};
+		while(loop);
 		cli();
 		LED_OFF;
 		display_string_xy("Game Over",SIDEBAR_START+10,10); 

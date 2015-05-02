@@ -1,5 +1,6 @@
 # FortunaTetris
 Tetris for the La Fortuna
+Makes use of Steve Gunn's library for drawing to the LCD
 
 #### Controls
 * Center - Rotate Clockwise

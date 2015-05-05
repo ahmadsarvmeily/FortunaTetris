@@ -10,6 +10,8 @@
 #define LED_OFF     PORTB &= ~_BV(PINB7) 
 #define LED_TOGGLE  PINB  |=  _BV(PINB7)
 
+#define DEBUG 0
+
 #define START_X 3
 #define START_Y 0
 
@@ -44,15 +46,19 @@ void redraw_tetromino(){
 }
 
 void show_grid(){
+	int ypos = 60;
 	char str[15];
-	display_string_xy("",0,0);
+	
 	int i, j = 0;
-	for ( i = 0; i < GRID_WIDTH; i++ ){
-		for ( j = 0; j < GRID_HEIGHT; j++ ){
-			sprintf(str,"%d",grid[i][j]);
-			display_string(str);
+	for ( i = 0; i < GRID_HEIGHT; i++ ){
+		display_string_xy("",SIDEBAR_START+10,ypos);
+		for ( j = 0; j < GRID_WIDTH; j++ ){
+			//sprintf(str,"%d",grid[j][i]);
+			//display_string(str);
+			if(grid[j][i]) {display_string("X");}
+			else {display_string("O");}
 		}
-		display_string("\n");
+		ypos += 10;
 	}
 }
 
@@ -282,6 +288,10 @@ ISR(TIMER1_COMPA_vect)
 
 ISR(TIMER3_COMPA_vect)
 {
+	if (DEBUG){
+		show_grid();
+		show_block_grid();
+	}
 	if (!at_bottom){
 		move_tetromino(Down);
 		redraw_tetromino();
@@ -340,7 +350,7 @@ int main()
 	display_string("    | | | |__  | | | |\\ \\ _| |_ _\\ \\\n");
 	display_string("    |_| |____| |_| |_| \\_\\_____|____|\n");
 	display_string("\n          Press Center to Start");
-
+	
 	do{
 		while(!center_pressed()){}
 		reset();

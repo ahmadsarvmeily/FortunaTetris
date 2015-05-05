@@ -71,15 +71,18 @@ int bottommost_rot_block(){
 }
 
 void show_block_grid(){
+	int ypos = 60 + (GRID_HEIGHT*10);
 	char str[15];
-	display_string_xy("",0,0);
 	int i, j = 0;
 	for ( i = 0; i < 4; i++ ){
+		display_string_xy("",SIDEBAR_START+10,ypos);
 		for ( j = 0; j < 4; j++ ){
-			sprintf(str,"%d",block_grid[i][j]);
-			display_string(str);
+			//sprintf(str,"%d",grid[j][i]);
+			//display_string(str);
+			if(block_grid[j][i]) {display_string("X");}
+			else {display_string("O");}
 		}
-		display_string("\n");
+		ypos += 10;
 	}
 }
 
@@ -239,7 +242,7 @@ void rotated_grid(tetromino_type piece, uint16_t angle){
 					break;
 				case 2:
 					for (i = 0; i < 2; i++ ) {
-						rot_grid[i+1][0] = 1;
+						rot_grid[i+1][1] = 1;
 					}
 					for (i = 0; i < 2; i++ ) {
 						rot_grid[i][2] = 1;
@@ -481,7 +484,7 @@ void draw_tetromino(tetromino_type piece, int16_t y, int16_t x, uint16_t angle, 
 				case 2:
 					for (i = 0; i < 2; i++ ) {
 						display_block(x+BLOCK_SIZE*(i+1),y+BLOCK_SIZE,color);
-						block_grid[i+1][0] = 1;
+						block_grid[i+1][1] = 1;
 					}
 					for (i = 0; i < 2; i++ ) {
 						display_block(x+BLOCK_SIZE*i,y+BLOCK_SIZE*2,color);

@@ -11,8 +11,8 @@
 
 #define BORDER_SIZE 2
 
-uint8_t block_grid [4][4];
-uint8_t rot_grid [4][4];
+volatile uint8_t block_grid [4][4];
+volatile uint8_t rot_grid [4][4];
 
 typedef enum {I = CYAN_1, O = YELLOW_1, T = PURPLE_1, J = BLUE_1, L = ORANGE_1, S = GREEN_1, Z = RED_1} tetromino_type;
 

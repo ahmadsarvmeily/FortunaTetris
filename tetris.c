@@ -31,7 +31,7 @@ int base_score[4] = {40,100,300,1200};
 
 volatile tetromino current_tetromino, last_tetromino;
 
-tetromino block_list[7] = {{O,START_X,START_Y,0},{I,START_X,START_Y,0},{T,START_X,START_Y,0},{J,START_X,START_Y,0},{L,START_X,START_Y,0},{S,START_X,START_Y,0},{Z,START_X,START_Y,0}};
+tetromino block_list[7] = {{O,START_X+1,START_Y,0},{I,START_X,START_Y,0},{T,START_X,START_Y,0},{J,START_X,START_Y,0},{L,START_X,START_Y,0},{S,START_X,START_Y,0},{Z,START_X,START_Y,0}};
 volatile int bag[7];
 volatile int blocks_taken = 7;
 
@@ -284,7 +284,7 @@ ISR(TIMER1_COMPA_vect)
 		//move_tetromino(Down);
 	}
 	if(down_held()){
-		move_tetromino(Down);
+		if (!at_bottom) move_tetromino(Down);
 	}
 }
 
@@ -352,6 +352,8 @@ int main()
 	display_string("    |_| |____| |_| |_| \\_\\_____|____|\n");
 	display_string("\n          Press Center to Start");
 	
+	LED_ON;
+
 	do{
 		while(!center_pressed()){}
 		reset();
@@ -365,11 +367,11 @@ int main()
 		srand(TCNT2);
 		spawn_block();
 		OCR1A = 65535;
-		LED_ON;
+		LED_OFF;
 		sei();
 		while(loop);
 		cli();
-		LED_OFF;
+		LED_ON;
 		display_string_xy("Game Over",SIDEBAR_START+10,10); 
 		display.background = BLACK;
 		display.foreground = WHITE;

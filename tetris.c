@@ -47,14 +47,12 @@ void redraw_tetromino(){
 
 void show_grid(){
 	int ypos = 60;
-	char str[15];
 	
 	int i, j = 0;
 	for ( i = 0; i < GRID_HEIGHT; i++ ){
 		display_string_xy("",SIDEBAR_START+10,ypos);
 		for ( j = 0; j < GRID_WIDTH; j++ ){
-			//sprintf(str,"%d",grid[j][i]);
-			//display_string(str);
+
 			if(grid[j][i]) {display_string("X");}
 			else {display_string("O");}
 		}
@@ -62,12 +60,12 @@ void show_grid(){
 	}
 }
 
-int clear_area(){
+void clear_area(){
 	rectangle clear = {0,GRID_WIDTH*BLOCK_SIZE,0,GRID_HEIGHT*BLOCK_SIZE};
 	fill_rectangle(clear,BLACK);
 }
 
-int clear_field(){
+void clear_field(){
 	int i, j = 0;
 	for ( i = 0; i < GRID_WIDTH; i++ ){
 		for ( j = 0; j < GRID_HEIGHT; j++ ){
@@ -76,7 +74,7 @@ int clear_field(){
 	}
 }
 
-int redraw(){
+void redraw(){
 	clear_area();
 	char points[15];
 	sprintf(points, "Lines: %d", lines);
@@ -94,7 +92,7 @@ int redraw(){
 }
 
 int check_line(int line){
-	int count = 0,j = 0;
+	int j = 0;
 	for ( j = 0; j < GRID_WIDTH; j++ ){
 		if (!(grid[j][line])) { return 0; }
 	}
@@ -173,9 +171,14 @@ int spawn_block(){
 		rand_num = random_block_number();
 	} while (!bag[rand_num]);
 	
+
+
 	bag[rand_num] = 0;
 	blocks_taken++;
 	new_tetromino = block_list[rand_num];
+
+	adjust_virtual_grid(new_tetromino.type,new_tetromino.angle);
+	update_block_grid();
 	if(check_collision(new_tetromino)) {last_tetromino = current_tetromino = new_tetromino; return 1;}
 	else { loop = 0; cli(); return 0;}
 }
@@ -186,24 +189,23 @@ int rotate_tetromino(){
 	if (new_tetromino.angle == 3) 
 		new_tetromino.angle = 0;
 	else new_tetromino.angle += 1;
-	rotated_grid(new_tetromino.type,new_tetromino.angle);
+	adjust_virtual_grid(new_tetromino.type,new_tetromino.angle);
 	
-	if ((new_tetromino.y + bottommost_rot_block()) > GRID_HEIGHT) return 0;
-	if ((new_tetromino.x + leftmost_rot_block()) < 0) return 0; 
-	if ((new_tetromino.x + rightmost_rot_block()) > GRID_WIDTH-1) return 0;
+	if ((new_tetromino.y + bottommost_virtual_block()) > GRID_HEIGHT) return 0;
+	if ((new_tetromino.x + leftmost_virtual_block()) < 0) return 0; 
+	if ((new_tetromino.x + rightmost_virtual_block()) > GRID_WIDTH-1) return 0;
 
 	if (!check_collision(new_tetromino)) return 0;
 	
 	current_tetromino = new_tetromino; 
 	redraw_tetromino();
-
+	return 1;
 }
 
 void move_tetromino(direction movement){
 	tetromino new_tetromino;
 	new_tetromino = current_tetromino;
 	last_tetromino = current_tetromino;
-	char str[15];
 	switch (movement){
 		case Up:
 			new_tetromino.y -= 1;
@@ -321,7 +323,6 @@ int main()
 	DDRB |= _BV(PB7);
 	PORTB &= ~_BV(PB7);
 
-	//EIMSK |= _BV(INT6);
 	/* enable button press inturrupt */
 	TCCR1A = 0;
 	TCCR1B = _BV(WGM12);
@@ -374,4 +375,6 @@ int main()
 		display.foreground = WHITE;
 		display_string_xy("Press Center to Restart",0,10);
 	} while (1);
+
+	return -1;
 }

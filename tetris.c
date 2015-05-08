@@ -1,19 +1,4 @@
-#include "tetromino.h"
-#include "switches.h"
-#include <avr/interrupt.h>
-#include <avr/io.h>
-#include <util/delay.h>
-#include <stdio.h>
-#include <stdlib.h> 
-
-#define LED_ON      PORTB |=  _BV(PINB7)
-#define LED_OFF     PORTB &= ~_BV(PINB7) 
-#define LED_TOGGLE  PINB  |=  _BV(PINB7)
-
-#define DEBUG 0
-
-#define START_X 3
-#define START_Y 0
+#include "tetris.h"
 
 volatile uint16_t grid [GRID_WIDTH][GRID_HEIGHT];
 
@@ -25,8 +10,6 @@ volatile int lines = 0;
 volatile int level = 0;
 volatile int score = 0;
 
-#define MAX_LEVEL 31
-
 int base_score[4] = {40,100,300,1200};
 
 volatile tetromino current_tetromino, last_tetromino;
@@ -34,9 +17,6 @@ volatile tetromino current_tetromino, last_tetromino;
 tetromino block_list[7] = {{O,START_X+1,START_Y,0},{I,START_X,START_Y,0},{T,START_X,START_Y,0},{J,START_X,START_Y,0},{L,START_X,START_Y,0},{S,START_X,START_Y,0},{Z,START_X,START_Y,0}};
 volatile int bag[7];
 volatile int blocks_taken = 7;
-
-typedef enum {Up,Down,Left,Right} direction;
-
 
 void redraw_tetromino(){
 	cli();
@@ -238,19 +218,6 @@ void move_tetromino(direction movement){
 		if (movement == Down) at_bottom = 1;
 	}
 	redraw_tetromino();
-}
-
-void draw_shape_alternate(rectangle shape, int counter){
-	if (counter % 2) {
-		fill_rectangle(shape,RED);
-	} else {
-		fill_rectangle(shape,YELLOW_4);
-		shape.left += BORDER_SIZE;
-		shape.right -= BORDER_SIZE;
-		shape.top += BORDER_SIZE;
-		shape.bottom -= BORDER_SIZE;
-		fill_rectangle(shape,YELLOW_1);
-	}
 }
 
 void reset(){

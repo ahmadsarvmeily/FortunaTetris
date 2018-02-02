@@ -1,6 +1,7 @@
 #include "switches.h"
 #include <avr/io.h>
 
+int rotate = 0;
 int center_down = 0;
 int left_down = 0;
 int right_down = 0;
@@ -9,6 +10,9 @@ int down_down = 0;
 int down = 0;
 
 void init_switches(){
+	DDRE &= ~_BV(ROTA) & ~_BV(ROTB);  /* Rot. Encoder inputs */
+	PORTE |= _BV(ROTA) | _BV(ROTB);   /* Rot. Encoder pull-ups */
+
 	DDRE &= ~_BV(SWC);
 	PORTE |= _BV(SWC);
 	DDRC &= ~_BV(SWN) & ~_BV(SWE) & ~_BV(SWS) & ~_BV(SWW);
@@ -21,6 +25,18 @@ void init_switches(){
 	PORTC |= COMPASS_SWITCHES; 
 
 	EICRB |= _BV(ISC40) | _BV(ISC50) | _BV(ISC71);
+}
+
+int right_rotate() {
+	if ((~PINE & _BV(ROTA)) && !rotate && !down) {
+		rotate = 1;
+		down = 1;
+		return 1;
+	} else if ((PINE & _BV(ROTA)) && rotate){
+		rotate = 0;
+		down = 0;
+	}
+	return 0;
 }
 
 int center_pressed(){

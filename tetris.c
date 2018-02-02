@@ -235,6 +235,9 @@ void reset(){
 
 ISR(TIMER1_COMPA_vect)
 {
+	if (right_rotate()) {
+		rotate_tetromino();
+	}
 	if (center_pressed()){
 		rotate_tetromino();
 	}
